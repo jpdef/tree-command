@@ -83,6 +83,7 @@ extern const struct linedraw *linedraw;
 
 int main(int argc, char **argv)
 {
+  printf("%s","Firing it up\n");
   char **dirname = NULL;
   int i,j=0,k,n,optf,p,q,dtotal,ftotal,colored = FALSE;
   struct stat st;
@@ -499,6 +500,7 @@ int main(int argc, char **argv)
 
   if (dirname) {
     for(colored=i=0;dirname[i];i++,colored=0) {
+      printf("Jumping into %s\n Geronimo ! \n\n",dirname[i]);
       if (fflag) {
 	do {
 	  j=strlen(dirname[i]);
@@ -690,6 +692,7 @@ struct _info **read_dir(char *dir, int *n)
   dl = (struct _info **)xmalloc(sizeof(struct _info *) * (ne = MINIT));
 
   while((ent = (struct dirent *)readdir(d))) {
+    printf("%s\n",ent->d_name);
     if (!strcmp("..",ent->d_name) || !strcmp(".",ent->d_name)) continue;
     if (Hflag && !strcmp(ent->d_name,"00Tree.html")) continue;
     if (!aflag && ent->d_name[0] == '.') continue;
@@ -778,6 +781,7 @@ struct _info **read_dir(char *dir, int *n)
  */
 struct _info **getfulltree(char *d, u_long lev, dev_t dev, off_t *size, char **err)
 {
+  printf("%s","get full tree called!");
   char *path;
   long pathsize = 0;
   struct _info **dir, **sav, **p, *sp;
@@ -862,6 +866,7 @@ struct _info **getfulltree(char *d, u_long lev, dev_t dev, off_t *size, char **e
 	else sprintf(path,"%s/%s",d,(*dir)->name);
 	saveino((*dir)->inode, (*dir)->dev);
 	(*dir)->child = getfulltree(path,lev+1,dev,&((*dir)->size),&((*dir)->err));
+        printf("%s", (*dir)->name);
       }
       // prune empty folders, unless they match the requested pattern
       if (pruneflag && (*dir)->child == NULL &&
