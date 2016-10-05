@@ -692,7 +692,6 @@ struct _info **read_dir(char *dir, int *n)
   dl = (struct _info **)xmalloc(sizeof(struct _info *) * (ne = MINIT));
 
   while((ent = (struct dirent *)readdir(d))) {
-    printf("%s\n",ent->d_name);
     if (!strcmp("..",ent->d_name) || !strcmp(".",ent->d_name)) continue;
     if (Hflag && !strcmp(ent->d_name,"00Tree.html")) continue;
     if (!aflag && ent->d_name[0] == '.') continue;
@@ -762,12 +761,12 @@ struct _info **read_dir(char *dir, int *n)
       }
     }
 #endif
-
     /* These should be elminiated, as they're barely used */
     dl[p]->isdir = ((st.st_mode & S_IFMT) == S_IFDIR);
     dl[p]->issok = ((st.st_mode & S_IFMT) == S_IFSOCK);
     dl[p]->isfifo = ((st.st_mode & S_IFMT) == S_IFIFO);
     dl[p++]->isexe = (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) ? 1 : 0;
+    
   }
   closedir(d);
   *n = p;
@@ -1195,8 +1194,8 @@ void printit(char *s)
   int c;
 
   if (Nflag) {
-    if (Qflag) fprintf(outfile, "\"%s\"",s);
-    else fprintf(outfile,"%s",s);
+    if (Qflag) fprintf(outfile, "\"%s\"bazbar",s);
+    else fprintf(outfile,"%sfoobar",s);
     return;
   }
   if (mb_cur_max > 1) {

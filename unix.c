@@ -98,11 +98,14 @@ off_t unix_listdir(char *d, int *dt, int *ft, u_long lev, dev_t dev)
     } else {
       if (sizeof(char) * (strlen((*dir)->name)+1) > pathsize)
 	path=xrealloc(path,pathsize=(sizeof(char) * (strlen((*dir)->name)+1024)));
-      sprintf(path,"%s",(*dir)->name);
+        sprintf(path,"%s",(*dir)->name);
     }
-
-    printit(path);
-
+    if((*dir)->isdir){
+        printit(path);
+    }else{
+        sprintf(path,"%s%s",path,"[FILE]");
+        printit(path);  
+    }
     if (colored) fprintf(outfile,"%s",endcode);
     if (Fflag && !(*dir)->lnk) {
       if ((c = Ftype((*dir)->mode))) fputc(c, outfile);
@@ -129,7 +132,7 @@ off_t unix_listdir(char *d, int *dt, int *ft, u_long lev, dev_t dev)
 	      listdir((*dir)->lnk,dt,ft,lev+1,dev);
 	    else {
 	      if (strlen(d)+strlen((*dir)->lnk)+2 > pathsize) path=xrealloc(path,pathsize=(strlen(d)+strlen((*dir)->name)+1024));
-	      if (fflag && !strcmp(d,"/")) sprintf(path,"%s%s",d,(*dir)->lnk);
+	      if (fflag && !strcmp(d,"/")) sprintf(path,"%s%s[DIR]",d,(*dir)->lnk);
 	      else sprintf(path,"%s/%s",d,(*dir)->lnk);
 	      listdir(path,dt,ft,lev+1,dev);
 	    }
