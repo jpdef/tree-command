@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "tree.h"
+#include <sys/stat.h>
 
 extern bool dflag, lflag, pflag, sflag, Fflag, aflag, fflag, uflag, gflag;
 extern bool Dflag, inodeflag, devflag, Rflag, duflag, pruneflag;
@@ -29,6 +30,31 @@ extern int Level, *dirs, maxdirs;
 
 extern bool colorize, linktargetcolor;
 extern char *endcode;
+
+char* extract_file_data(char* path){
+      struct stat filestatus;
+      char* data = (char*) malloc(256*sizeof(char));
+      if ( stat(path, &filestatus) != 0) {
+         fprintf(stderr, "File %s not found\n", path);
+         sprintf(data,"File not found");  
+         return data;
+      }
+      if( filestatus.st_size == 0 ){
+         sprintf(data,"Empty");
+         return data;
+      }  
+      data = (char*) realloc(data,filestatus.st_size);
+      FILE* fp = fopen(path,"r");
+      if (fp == NULL ){
+         sprintf(data,"Fail to open");  
+      }else if (fread(data,filestatus.st_size,1,fp) !=  1) {
+         sprintf(data,"Fail to read");  
+      } else if( data == NULL){
+         sprintf(data,"Empty");  
+      }
+      
+      return data;
+}
 
 off_t unix_listdir(char *d, int *dt, int *ft, u_long lev, dev_t dev)
 {
@@ -103,8 +129,12 @@ off_t unix_listdir(char *d, int *dt, int *ft, u_long lev, dev_t dev)
     if((*dir)->isdir){
         printit(path);
     }else{
-        sprintf(path,"%s%s",path,"[FILE]");
-        printit(path);  
+        char* abspath=xrealloc(path,pathsize=(sizeof(char) * (strlen(d)+strlen((*dir)->name)+1024)));
+        sprintf(abspath,"%s/%s",d,(*dir)->name);
+        char* meta_data  = extract_file_data(abspath);
+        sprintf(path,"%s%s",path,meta_data);
+        printit(path);
+        free(meta_data);  
     }
     if (colored) fprintf(outfile,"%s",endcode);
     if (Fflag && !(*dir)->lnk) {
